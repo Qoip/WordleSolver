@@ -10,13 +10,12 @@
 
 // TODO:
 // locale? ok // hell // chcp 1251
-// last word guess
-// first word always same
-// iterate on only good masks
+// expected get time
 /* mask tree:
     -time on each
     +more is_availables
 */
+// first word always same
 
 class WordleSolver {
  private:
@@ -27,19 +26,15 @@ class WordleSolver {
       size_t min = 0;
       size_t max = SIZE_MAX;
     };
-    std::vector<char> exact;
-    std::vector<char> exactly_not;
     std::vector<LetterConstarains> letters_constarains;
+    std::vector<std::pair<bool, char>> strict_letters;
 
    public:
-    Mask(const std::string& query, const std::vector<uint8_t>& result) : exact(result.size(), '\0'), exactly_not(result.size(), '\0') {
+    Mask(const std::string& query, const std::vector<uint8_t>& result) : strict_letters(query.size()) {
       size_t query_size = result.size();
       for (size_t i = 0; i < query_size; ++i) {
-        if (result[i] == 2) {
-          exact[i] = query[i];
-        } else {
-          exactly_not[i] = query[i];
-        }
+        strict_letters[i].second = query[i];
+        strict_letters[i].first = result[i] == 2;
       }
       std::vector<std::pair<char, uint8_t>> full_query(query_size);
       for (size_t i = 0; i < query_size; ++i) {
@@ -71,14 +66,11 @@ class WordleSolver {
     bool IsSatisfy(std::string& query) {
       size_t query_size = query.size();
       for (size_t i = 0; i < query_size; ++i) { /// make "exact" as list of needed
-        if (exact[i] != '\0' && exact[i] != query[i]) {
-          return false;
-        }
-        if (exactly_not[i] == query[i]) {
+        if (strict_letters[i].first ^ (strict_letters[i].second == query[i])) {
           return false;
         }
       }
-      for (size_t i = 0; i < letters_constarains.size(); ++i) { /// 2 pointers
+      for (size_t i = 0; i < letters_constarains.size(); ++i) {
         size_t count = std::count(query.begin(), query.end(), letters_constarains[i].symbol);
         if (count < letters_constarains[i].min || count > letters_constarains[i].max) {
           return false;
