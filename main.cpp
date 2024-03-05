@@ -234,7 +234,7 @@ class WordleSolver {
     std::vector<std::string> new_sorted_words;
     size_t deleting_index = 0;
     for (int i = 0; i < sorted_words.size(); ++i) {
-      if (deleting_index < unreliable_query_word_indexes.size() && i != unreliable_query_word_indexes[deleting_index]) {
+      if (deleting_index >= unreliable_query_word_indexes.size() || i != unreliable_query_word_indexes[deleting_index]) {
         new_sorted_words.push_back(sorted_words[i]);
       } else {
         ++deleting_index;
